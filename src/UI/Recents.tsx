@@ -12,13 +12,14 @@ export interface Recent {
 
 export interface RecentsProps {
   onBeforeRemove?: (items: Recent[]) => boolean;
+  namespace?: string;
 }
 
-const Recents: React.FC<RecentsProps> = ({ onBeforeRemove }) => {
+const Recents: React.FC<RecentsProps> = ({ onBeforeRemove,namespace }) => {
   const [recents, setRecents] = useState<Recent[]>([]);
 
   useEffect(() => {
-    const tracker = new OnBrowserLocationTracker({ maxRecents: 10 });
+    const tracker = new OnBrowserLocationTracker({ maxRecents: 10, namespace: namespace });
 
     const loadRecents = async () => {
       const storedRecents = await tracker.getRecentsAsync();

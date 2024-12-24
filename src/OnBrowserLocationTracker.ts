@@ -7,6 +7,7 @@ interface ITrackable {
 
 export interface OnBrowserLocationTrackerConfig {
   maxRecents: number; // Maximum number of recents to keep
+  namespace?: string;
   dontTrack?: {
     withPrefix?: ITrackable[];
     withSuffix?: ITrackable[];
@@ -18,6 +19,7 @@ export class OnBrowserLocationTracker {
   private storageKey = "recents";
   private maxRecents: number;
   private titleObserver: MutationObserver | null = null;
+  private namespace: string;
   private dontTrack?: {
     withPrefix?: ITrackable[];
     withSuffix?: ITrackable[];
@@ -27,15 +29,20 @@ export class OnBrowserLocationTracker {
   constructor(config: OnBrowserLocationTrackerConfig) {
     this.maxRecents = config.maxRecents;
     this.dontTrack = config.dontTrack;
+    this.namespace = config.namespace ?? "global";
+  }
+
+  private get fullStorageKey() : string{
+    return `${this.namespace}_${this.storageKey}`;
   }
 
   private async getStoredRecents(): Promise<ILocation[]> {
-    const data = localStorage.getItem(this.storageKey);
+    const data = localStorage.getItem(this.fullStorageKey);
     return data ? JSON.parse(data) : [];
   }
 
   private async saveRecents(recents: ILocation[]): Promise<void> {
-    localStorage.setItem(this.storageKey, JSON.stringify(recents));
+    localStorage.setItem(this.fullStorageKey, JSON.stringify(recents));
   }
 
   private shouldTrack(location: ILocation): boolean {
@@ -102,7 +109,7 @@ export class OnBrowserLocationTracker {
   }
 
   async clearRecents(): Promise<void> {
-    localStorage.removeItem(this.storageKey);
+    localStorage.removeItem(this.fullStorageKey);
   }
 
   getCurrentLocation(): ILocation | null {

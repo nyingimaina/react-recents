@@ -1,4 +1,3 @@
-
 # OnBrowserLocationTracker and Recents Component
 
 This package provides a utility for tracking recent browser locations (URLs and window titles) and a React component for displaying them. It allows for a configurable number of recent locations and enables you to track, remove, and clear recents.
@@ -9,14 +8,6 @@ This package provides a utility for tracking recent browser locations (URLs and 
 - **Recents Component**: Displays the tracked recents in a React component, with options to remove individual entries or clear all recents.
 - **Customization**: You can customize how many recents are stored and apply rules to prevent tracking specific URLs or titles.
 
-## Installation
-
-To install the package, run the following command:
-
-```bash
-npm install on-browser-location-tracker
-```
-
 ## Usage
 
 ### Setting Up the Tracker
@@ -24,7 +15,7 @@ npm install on-browser-location-tracker
 You can use the `OnBrowserLocationTracker` class to track recent locations. Here's an example of how to instantiate it and track a visit:
 
 ```ts
-import { OnBrowserLocationTracker } from "on-browser-location-tracker";
+import { OnBrowserLocationTracker } from 'on-browser-location-tracker';
 
 const tracker = new OnBrowserLocationTracker({ maxRecents: 10 });
 
@@ -43,8 +34,8 @@ The `Recents` component displays the recent locations in a list. It automaticall
 #### Example Usage:
 
 ```tsx
-import React from "react";
-import Recents from "on-browser-location-tracker/Recents";
+import React from 'react';
+import Recents from 'on-browser-location-tracker/Recents';
 
 const App: React.FC = () => {
   return (
