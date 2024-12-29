@@ -17,17 +17,35 @@ export interface OnBrowserLocationTrackerConfig {
   disregardQueryStrings?: { path: string; queryStrings: string[] }[];
 }
 
+const defaultNamespace = 'global';
+
 export class OnBrowserLocationTracker {
   private storageKey = 'recents';
   private titleObserver: MutationObserver | null = null;
   private config: OnBrowserLocationTrackerConfig;
+  private static _namespace: string = '';
 
   constructor(config: OnBrowserLocationTrackerConfig) {
     this.config = config;
+    if (!OnBrowserLocationTracker._namespace) {
+      if (this.config.namespace) {
+        OnBrowserLocationTracker._namespace = this.config.namespace;
+      } else {
+        OnBrowserLocationTracker._namespace = defaultNamespace;
+      }
+    }
+  }
+
+  public static get namespace(): string {
+    if (this._namespace) {
+      return this._namespace;
+    } else {
+      return defaultNamespace;
+    }
   }
 
   private get fullStorageKey(): string {
-    return `${this.config.namespace}_${this.storageKey}`;
+    return `${OnBrowserLocationTracker.namespace}_${this.storageKey}`;
   }
 
   private async getStoredRecents(): Promise<ILocation[]> {
