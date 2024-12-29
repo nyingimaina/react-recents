@@ -1,7 +1,7 @@
 {
   "name": "jattac.react.recents",
-  "version": "0.0.3",
-  "description": "",
+  "version": "0.0.4",
+  "description": "A React component and utility for tracking and displaying recent browser locations and URLs.",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -13,10 +13,21 @@
   },
   "keywords": [
     "react",
-    "typescript"
+    "typescript",
+    "recently-visited",
+    "browser-history",
+    "recents-tracker"
   ],
   "author": "Nyingi Maina",
   "license": "MIT",
+  "homepage": "https://github.com/nyingimaina/react-recents",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyingimaina/react-recents.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nyingimaina/react-recents/issues"
+  },
   "peerDependencies": {
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0",
@@ -52,7 +63,15 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@rollup/plugin-terser": "^0.4.4",
     "tslib": "^2.6.2"
-  }
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ]
 }

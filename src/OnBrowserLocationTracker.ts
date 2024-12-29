@@ -1,4 +1,4 @@
-import ILocation from "./ILocation";
+import ILocation from './ILocation';
 
 interface ITrackable {
   urlOrTitle?: string;
@@ -13,27 +13,21 @@ export interface OnBrowserLocationTrackerConfig {
     withSuffix?: ITrackable[];
     contains?: ITrackable[];
   };
+
+  disregardQueryStrings?: { path: string; queryStrings: string[] }[];
 }
 
 export class OnBrowserLocationTracker {
-  private storageKey = "recents";
-  private maxRecents: number;
+  private storageKey = 'recents';
   private titleObserver: MutationObserver | null = null;
-  private namespace: string;
-  private dontTrack?: {
-    withPrefix?: ITrackable[];
-    withSuffix?: ITrackable[];
-    contains?: ITrackable[];
-  };
+  private config: OnBrowserLocationTrackerConfig;
 
   constructor(config: OnBrowserLocationTrackerConfig) {
-    this.maxRecents = config.maxRecents;
-    this.dontTrack = config.dontTrack;
-    this.namespace = config.namespace ?? "global";
+    this.config = config;
   }
 
-  private get fullStorageKey() : string{
-    return `${this.namespace}_${this.storageKey}`;
+  private get fullStorageKey(): string {
+    return `${this.config.namespace}_${this.storageKey}`;
   }
 
   private async getStoredRecents(): Promise<ILocation[]> {
@@ -47,21 +41,16 @@ export class OnBrowserLocationTracker {
 
   private shouldTrack(location: ILocation): boolean {
     debugger;
-    if (!this.dontTrack) return true; // If no dontTrack rules, always track
+    if (!this.config.dontTrack) return true; // If no dontTrack rules, always track
 
-    const { withPrefix, withSuffix, contains } = this.dontTrack;
+    const { withPrefix, withSuffix, contains } = this.config.dontTrack;
 
     // Helper function to check a condition
-    const matchesCondition = (
-      value: string | undefined,
-      patterns: ITrackable[]
-    ): boolean => {
+    const matchesCondition = (value: string | undefined, patterns: ITrackable[]): boolean => {
       if (!value || !patterns) return false;
       return patterns.some((pattern) => {
         const { urlOrTitle: title, url } = pattern;
-        return (
-          (title && value.startsWith(title)) || (url && value.startsWith(url))
-        );
+        return (title && value.startsWith(title)) || (url && value.startsWith(url));
       });
     };
 
@@ -70,8 +59,7 @@ export class OnBrowserLocationTracker {
     for (let i = 0; i < matchables.length; i++) {
       const specificMatchable = matchables[i] ?? [];
       const foundMatch =
-        matchesCondition(location.url, specificMatchable) ||
-        matchesCondition(location.windowTitle, specificMatchable);
+        matchesCondition(location.url, specificMatchable) || matchesCondition(location.windowTitle, specificMatchable);
       if (foundMatch) {
         return false;
       }
@@ -80,6 +68,7 @@ export class OnBrowserLocationTracker {
   }
 
   async trackVisit(location: ILocation): Promise<void> {
+    location.url = this.processUrlForTracking(location.url);
     if (!this.shouldTrack(location)) return; // Skip tracking if location matches dontTrack rules
 
     const recents = await this.getStoredRecents();
@@ -91,7 +80,7 @@ export class OnBrowserLocationTracker {
     updatedRecents.unshift(location);
 
     // Enforce the limit
-    if (updatedRecents.length > this.maxRecents) {
+    if (updatedRecents.length > this.config.maxRecents) {
       updatedRecents.pop();
     }
 
@@ -117,23 +106,45 @@ export class OnBrowserLocationTracker {
     if (!window.location.href) return null;
 
     // Check if the document is fully loaded before accessing <title>
-    if (document.readyState === "complete") {
+    if (document.readyState === 'complete') {
       this.observeTitleChange();
     } else {
       // If the document is not fully loaded, listen for the load event
-      window.addEventListener("load", () => this.observeTitleChange());
+      window.addEventListener('load', () => this.observeTitleChange());
     }
 
     return null; // MutationObserver will handle updates
   }
 
+  /**
+   * Processes the URL for tracking, taking into account the disregardQueryStrings configuration.
+   * @param url The URL to process.
+   * @returns The processed URL.
+   */
+  private processUrlForTracking(url: string): string {
+    if (!this.config.disregardQueryStrings) return url;
+
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+
+    this.config.disregardQueryStrings.forEach(({ path: disregardPath, queryStrings }) => {
+      if (path.startsWith(disregardPath)) {
+        queryStrings.forEach((queryString) => {
+          urlObj.searchParams.delete(queryString);
+        });
+      }
+    });
+
+    return urlObj.toString();
+  }
+
   private observeTitleChange(): void {
-    const titleElement = document.querySelector("title");
+    const titleElement = document.querySelector('title');
 
     // Fallback if the title is not available
     if (!titleElement) {
       // If no title tag found, observe the <head> element instead
-      const headElement = document.querySelector("head");
+      const headElement = document.querySelector('head');
 
       if (!headElement) return;
 
@@ -163,7 +174,7 @@ export class OnBrowserLocationTracker {
 
     // Truncate title if it exceeds max length and add ellipses
     if (title.length > maxTitleLength) {
-      title = title.substring(0, maxTitleLength) + "...";
+      title = title.substring(0, maxTitleLength) + '...';
     }
 
     const location: ILocation = {

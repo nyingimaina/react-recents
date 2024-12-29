@@ -1,41 +1,42 @@
 # OnBrowserLocationTracker and Recents Component
 
-This package provides a utility for tracking recent browser locations (URLs and window titles) and a React component for displaying them. It allows for a configurable number of recent locations and enables you to track, remove, and clear recents.
+This package helps track the websites you've visited (URLs and window titles) and shows them in a React component. It allows you to customize how many recents you want to keep, and you can remove or clear them if needed.
 
 ## Features
 
-- **OnBrowserLocationTracker**: Tracks recent URLs and window titles in `localStorage`.
-- **Recents Component**: Displays the tracked recents in a React component, with options to remove individual entries or clear all recents.
-- **Customization**: You can customize how many recents are stored and apply rules to prevent tracking specific URLs or titles.
+- **OnBrowserLocationTracker**: Tracks the websites you've visited (URL and title) in `localStorage`.
+- **Recents Component**: Shows the recent websites in a list. You can remove individual items or clear all of them.
+- **Custom Rules**: You can control how many recents are stored and set rules to avoid tracking certain URLs or titles.
 
-## Usage
+## How It Works
 
 ### Setting Up the Tracker
 
-You can use the `OnBrowserLocationTracker` class to track recent locations. Here's an example of how to instantiate it and track a visit:
+The `OnBrowserLocationTracker` is used to track your visited websites (URLs). Here's how you can set it up:
 
 ```ts
-import { OnBrowserLocationTracker } from 'on-browser-location-tracker';
+import { OnBrowserLocationTracker } from 'jattac.react.recents';
 
+// Create a new tracker with a limit of 10 recents
 const tracker = new OnBrowserLocationTracker({ maxRecents: 10 });
 
-// Track a new location (e.g., from a window or URL change)
+// Track the current page (URL and title) when you visit it
 tracker.trackVisit({
-  url: window.location.href,
-  windowTitle: document.title,
-  lastVisited: new Date().toISOString(),
+  url: window.location.href, // Current page URL
+  windowTitle: document.title, // Current page title
+  lastVisited: new Date().toISOString(), // Current timestamp
 });
 ```
 
 ### Recents Component
 
-The `Recents` component displays the recent locations in a list. It automatically loads the stored recents from `localStorage` using the `OnBrowserLocationTracker`.
+The `Recents` component shows the recent websites you've visited. It loads this data from your browser's `localStorage` using the `OnBrowserLocationTracker`.
 
 #### Example Usage:
 
 ```tsx
 import React from 'react';
-import Recents from 'on-browser-location-tracker/Recents';
+import { Recents } from 'jattac.react.recents';
 
 const App: React.FC = () => {
   return (
@@ -43,7 +44,7 @@ const App: React.FC = () => {
       <h1>Your Recent Activity</h1>
       <Recents
         onBeforeRemove={(items) => {
-          // Optionally, check before removing items (returns true to proceed)
+          // Optionally, ask the user before removing recents
           return window.confirm(`Are you sure you want to remove these recents?`);
         }}
       />
@@ -56,25 +57,25 @@ export default App;
 
 #### Props for `Recents` Component
 
-- **`onBeforeRemove` (optional)**: A callback function that is called before removing an item or clearing all recents. It receives an array of recents to be removed. If it returns `false`, the removal is cancelled.
+- **`onBeforeRemove` (optional)**: A function that runs before removing any recent items. It gets an array of items to be removed. If it returns `false`, the removal will be canceled.
 
 ```tsx
 const onBeforeRemove = (items: Recent[]) => {
-  // Perform custom logic before removing recents
-  return true; // return false to prevent removal
+  // Do something before removing items
+  return true; // return false to cancel removal
 };
 ```
 
 #### Available Methods
 
-- **`trackVisit(location: ILocation): Promise<void>`**: Tracks a new location.
-- **`getRecentsAsync(): Promise<ILocation[]>`**: Retrieves the list of recent locations.
-- **`removeRecent(url: string): Promise<void>`**: Removes a specific recent location by URL.
-- **`clearRecents(): Promise<void>`**: Clears all recent locations.
+- **`trackVisit(location: ILocation): Promise<void>`**: Tracks a new location (URL and title).
+- **`getRecentsAsync(): Promise<ILocation[]>`**: Fetches the list of recent locations.
+- **`removeRecent(url: string): Promise<void>`**: Removes a specific recent location by its URL.
+- **`clearRecents(): Promise<void>`**: Clears all stored recents.
 
 #### Styling
 
-You can customize the appearance of the `Recents` component using CSS. The `Recents` component uses the following CSS classes:
+You can customize how the `Recents` component looks by changing the CSS. The component uses the following classes:
 
 - `.recentsContainer`
 - `.recentsTitle`
@@ -86,7 +87,7 @@ You can customize the appearance of the `Recents` component using CSS. The `Rece
 - `.noRecents`
 - `.noRecentsText`
 
-You can override these classes by editing the `Recents.module.css` file or writing your own styles.
+You can change these styles by editing the `Recents.module.css` file or by writing your own styles.
 
 #### Example Styles (for reference):
 
@@ -139,7 +140,7 @@ You can override these classes by editing the `Recents.module.css` file or writi
 
 ## Contributing
 
-Feel free to open an issue or submit a pull request if you have suggestions, bug fixes, or improvements.
+If you have any suggestions, bug fixes, or improvements, feel free to open an issue or submit a pull request.
 
 ## License
 
