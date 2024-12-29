@@ -1,11 +1,11 @@
 # OnBrowserLocationTracker and Recents Component
 
-This package helps track the websites you've visited (URLs and window titles) and shows them in a React component. It allows you to customize how many recents you want to keep, and you can remove or clear them if needed.
+This package helps track the websites you've visited (URLs and window titles) and shows them in a React component. You can customize how many recent sites you want to keep and easily remove or clear them if needed.
 
 ## Features
 
 - **OnBrowserLocationTracker**: Tracks the websites you've visited (URL and title) in `localStorage`.
-- **Recents Component**: Shows the recent websites in a list. You can remove individual items or clear all of them.
+- **Recents Component**: Displays the recent websites in a list. You can remove individual items or clear all of them.
 - **Custom Rules**: You can control how many recents are stored and set rules to avoid tracking certain URLs or titles.
 
 ## How It Works
@@ -27,6 +27,58 @@ tracker.trackVisit({
   lastVisited: new Date().toISOString(), // Current timestamp
 });
 ```
+
+### Configurations for `OnBrowserLocationTrackerConfig`
+
+You can customize the behavior of the tracker with the following configuration options:
+
+#### 1. `maxRecents` (required)
+
+- **What is it?**: This option controls how many recent URLs and titles are kept in `localStorage`. Once this limit is reached, older items will be removed to make space for new ones.
+- **Why is it useful?**: This helps prevent the storage from becoming too large. For example, if you only want to keep track of the 10 most recent websites, you can set `maxRecents: 10`.
+- **Example**:
+  ```ts
+  const tracker = new OnBrowserLocationTracker({ maxRecents: 5 });
+  ```
+
+#### 2. `namespace` (optional)
+
+- **What is it?**: This is an optional string value that adds a prefix to the key used in `localStorage`. If not provided, a default key is used.
+- **Why is it useful?**: This is useful if you want to have different recents trackers for different sections of your app or for different users, without the data overwriting each other.
+- **Example**:
+  ```ts
+  const tracker = new OnBrowserLocationTracker({ namespace: 'user1' });
+  ```
+
+#### 3. `dontTrack` (optional)
+
+- **What is it?**: This config option allows you to specify rules for URLs or titles that shouldn't be tracked. You can filter URLs based on a prefix, suffix, or if they contain certain substrings.
+- **Why is it useful?**: You might want to avoid tracking certain pages (e.g., login pages, privacy-sensitive pages, or pages with URLs you don't need in your recents).
+- **Properties**:
+  - **`withPrefix`**: An array of strings to match URLs that start with the specified prefix.
+  - **`withSuffix`**: An array of strings to match URLs that end with the specified suffix.
+  - **`contains`**: An array of strings to match URLs that contain the specified substring.
+- **Example**:
+  ```ts
+  const tracker = new OnBrowserLocationTracker({
+    dontTrack: {
+      withPrefix: ['https://example.com/login'],
+      withSuffix: ['/logout'],
+      contains: ['secret'],
+    },
+  });
+  ```
+
+#### 4. `disregardQueryStrings` (optional)
+
+- **What is it?**: This option allows you to specify which query strings should be disregarded when tracking URLs. You can provide an array of paths and query strings to exclude from the URL tracking.
+- **Why is it useful?**: Sometimes URLs may contain dynamic query strings (e.g., session IDs, filters) that don't need to be tracked as they don't affect the actual page content you want to track.
+- **Example**:
+  ```ts
+  const tracker = new OnBrowserLocationTracker({
+    disregardQueryStrings: [{ path: '/products', queryStrings: ['sort', 'filter'] }],
+  });
+  ```
 
 ### Recents Component
 
