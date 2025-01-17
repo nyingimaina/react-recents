@@ -50,15 +50,20 @@ export class OnBrowserLocationTracker {
 
   private async getStoredRecents(): Promise<ILocation[]> {
     const data = localStorage.getItem(this.fullStorageKey);
-    return data ? JSON.parse(data) : [];
+    const result = data ? JSON.parse(data) : [];
+    return result.filter((a: ILocation) => this.isValid(a));
+  }
+
+  private isValid(location: ILocation): boolean {
+    return location.url && location.windowTitle ? true : false;
   }
 
   private async saveRecents(recents: ILocation[]): Promise<void> {
-    localStorage.setItem(this.fullStorageKey, JSON.stringify(recents));
+    const validRecents = recents.filter((a: ILocation) => this.isValid(a));
+    localStorage.setItem(this.fullStorageKey, JSON.stringify(validRecents));
   }
 
   private shouldTrack(location: ILocation): boolean {
-    debugger;
     if (!this.config.dontTrack) return true; // If no dontTrack rules, always track
 
     const { withPrefix, withSuffix, contains } = this.config.dontTrack;

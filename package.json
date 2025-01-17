@@ -1,6 +1,6 @@
 {
   "name": "jattac.react.recents",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "A React component and utility for tracking and displaying recent browser locations and URLs.",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
