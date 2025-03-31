@@ -50,8 +50,12 @@ export class OnBrowserLocationTracker {
 
   private async getStoredRecents(): Promise<ILocation[]> {
     const data = localStorage.getItem(this.fullStorageKey);
-    const result = data ? JSON.parse(data) : [];
-    return result.filter((a: ILocation) => this.isValid(a));
+    const result = (data ? JSON.parse(data) : []) as ILocation[];
+    const validRecents = result
+      .filter((a: ILocation) => this.isValid(a))
+      .sort((a: ILocation, b: ILocation) => new Date(b.lastVisited).getTime() - new Date(a.lastVisited).getTime());
+    const uniqueByDisplayLabel = [...new Map(validRecents.map((item: ILocation) => [item.windowTitle, item])).values()];
+    return uniqueByDisplayLabel;
   }
 
   private isValid(location: ILocation): boolean {
