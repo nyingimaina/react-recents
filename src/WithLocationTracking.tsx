@@ -43,6 +43,7 @@ const withLocationTracking = (
           window.removeEventListener('hashchange', handleHashChange);
         };
       }
+      return () => {}; // Return an empty cleanup function for server-side rendering
     }, []);
 
     return <WrappedComponent {...props} />;

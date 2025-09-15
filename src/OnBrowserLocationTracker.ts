@@ -54,8 +54,8 @@ export class OnBrowserLocationTracker {
     const validRecents = result
       .filter((a: ILocation) => this.isValid(a))
       .sort((a: ILocation, b: ILocation) => new Date(b.lastVisited).getTime() - new Date(a.lastVisited).getTime());
-    const uniqueByDisplayLabel = [...new Map(validRecents.map((item: ILocation) => [item.windowTitle, item])).values()];
-    return uniqueByDisplayLabel;
+    const uniqueByUrl = [...new Map(validRecents.map((item: ILocation) => [item.url, item])).values()];
+    return uniqueByUrl;
   }
 
   private isValid(location: ILocation): boolean {

@@ -1,199 +1,251 @@
-# OnBrowserLocationTracker and Recents Component
+# React Recents: Track and Display User Navigation
 
-This package helps track the websites you've visited (URLs and window titles) and shows them in a React component. You can customize how many recent sites you want to keep and easily remove or clear them if needed.
+`jattac.react.recents` is a lightweight and flexible React library that allows you to track a user's browsing history within your application and display it in a polished and customizable "Recently Visited" component.
+
+It's designed to be easy to use, mobile-first, and highly configurable to fit the needs of your project.
+
+![Recents Component Screenshot](https://i.imgur.com/your-screenshot.png) <!-- TODO: Add a real screenshot -->
 
 ## Features
 
-- **OnBrowserLocationTracker**: Tracks the websites you've visited (URL and title) in `localStorage`.
-- **Recents Component**: Displays the recent websites in a list. You can remove individual items or clear all of them.
-- **Custom Rules**: You can control how many recents are stored and set rules to avoid tracking certain URLs or titles.
+- **📝 LocalStorage Tracking**: Persists recent locations in the user's browser.
+- **⚛️ React Components**: Includes a `Recents` component to display activity and a `withLocationTracking` HOC for automatic tracking.
+- **⚙️ Highly Configurable**: Control the number of recents, create separate tracking namespaces, and define rules to exclude specific URLs or query parameters.
+- **🎨 Customizable UI**: Style the component to match your application's look and feel using CSS Modules.
+- **📱 Mobile-First Design**: The component is responsive and optimized for both mobile and desktop screens.
+- **✨ Modern Look & Feel**: Includes favicons, smooth animations, and a clean UI out of the box.
 
-## How It Works
+## Installation
 
-### Setting Up the Tracker
+Install the package using npm or yarn:
 
-The `OnBrowserLocationTracker` is used to track your visited websites (URLs). Here's how you can set it up:
-
-```ts
-import { OnBrowserLocationTracker } from 'jattac.react.recents';
-
-// Create a new tracker with a limit of 10 recents
-const tracker = new OnBrowserLocationTracker({ maxRecents: 10 });
-
-// Track the current page (URL and title) when you visit it
-tracker.trackVisit({
-  url: window.location.href, // Current page URL
-  windowTitle: document.title, // Current page title
-  lastVisited: new Date().toISOString(), // Current timestamp
-});
+```bash
+npm install jattac.react.recents
 ```
 
-### Configurations for `OnBrowserLocationTrackerConfig`
+```bash
+yarn add jattac.react.recents
+```
 
-You can customize the behavior of the tracker with the following configuration options:
+## Core Concepts
 
-#### 1. `maxRecents` (required)
+The library is split into two main parts:
 
-- **What is it?**: This option controls how many recent URLs and titles are kept in `localStorage`. Once this limit is reached, older items will be removed to make space for new ones.
-- **Why is it useful?**: This helps prevent the storage from becoming too large. For example, if you only want to keep track of the 10 most recent websites, you can set `maxRecents: 10`.
-- **Example**:
-  ```ts
-  const tracker = new OnBrowserLocationTracker({ maxRecents: 5 });
-  ```
+1.  **`OnBrowserLocationTracker`**: A powerful class for the core tracking logic. You can use it to manually track visits, retrieve the list of recents, and manage the stored data.
+2.  **`Recents` Component**: A React component that uses the tracker to automatically fetch and display the list of recently visited pages in a user-friendly interface.
 
-#### 2. `namespace` (optional)
+---
 
-- **What is it?**: This is an optional string value that adds a prefix to the key used in `localStorage`. If not provided, a default key is used.
-- **Why is it useful?**: This is useful if you want to have different recents trackers for different sections of your app or for different users, without the data overwriting each other.
-- **Example**:
-  ```ts
-  const tracker = new OnBrowserLocationTracker({ namespace: 'user1' });
-  ```
+## `Recents` Component Guide
 
-#### 3. `dontTrack` (optional)
+This is the quickest way to get up and running. The `Recents` component is a ready-to-use UI element that handles everything for you.
 
-- **What is it?**: This config option allows you to specify rules for URLs or titles that shouldn't be tracked. You can filter URLs based on a prefix, suffix, or if they contain certain substrings.
-- **Why is it useful?**: You might want to avoid tracking certain pages (e.g., login pages, privacy-sensitive pages, or pages with URLs you don't need in your recents).
-- **Properties**:
-  - **`withPrefix`**: An array of strings to match URLs that start with the specified prefix.
-  - **`withSuffix`**: An array of strings to match URLs that end with the specified suffix.
-  - **`contains`**: An array of strings to match URLs that contain the specified substring.
-- **Example**:
-  ```ts
-  const tracker = new OnBrowserLocationTracker({
-    dontTrack: {
-      withPrefix: ['https://example.com/login'],
-      withSuffix: ['/logout'],
-      contains: ['secret'],
-    },
-  });
-  ```
+### Basic Usage
 
-#### 4. `disregardQueryStrings` (optional)
-
-- **What is it?**: This option allows you to specify which query strings should be disregarded when tracking URLs. You can provide an array of paths and query strings to exclude from the URL tracking.
-- **Why is it useful?**: Sometimes URLs may contain dynamic query strings (e.g., session IDs, filters) that don't need to be tracked as they don't affect the actual page content you want to track.
-- **Example**:
-  ```ts
-  const tracker = new OnBrowserLocationTracker({
-    disregardQueryStrings: [{ path: '/products', queryStrings: ['sort', 'filter'] }],
-  });
-  ```
-
-### Recents Component
-
-The `Recents` component shows the recent websites you've visited. It loads this data from your browser's `localStorage` using the `OnBrowserLocationTracker`.
-
-#### Example Usage:
+Import the `Recents` component and add it to your application.
 
 ```tsx
 import React from 'react';
 import { Recents } from 'jattac.react.recents';
 
-const App: React.FC = () => {
+const MyDashboard = () => {
   return (
     <div>
-      <h1>Your Recent Activity</h1>
-      <Recents
-        onBeforeRemove={(items) => {
-          // Optionally, ask the user before removing recents
-          return window.confirm(`Are you sure you want to remove these recents?`);
-        }}
-      />
+      <h1>Welcome Back!</h1>
+      
+      {/* Your other dashboard components */}
+      
+      <div style={{ marginTop: '40px' }}>
+        <Recents />
+      </div>
     </div>
   );
 };
 
-export default App;
+export default MyDashboard;
 ```
 
-#### Props for `Recents` Component
+### Component Props
 
-- **`onBeforeRemove` (optional)**: A function that runs before removing any recent items. It gets an array of items to be removed. If it returns `false`, the removal will be canceled.
+You can customize the `Recents` component with the following props:
+
+| Prop             | Type                               | Default | Description                                                                                                                            |
+| ---------------- | ---------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `maxRecents`     | `number`                           | `10`    | The maximum number of recent items to store and display.                                                                               |
+| `namespace`      | `string`                           | `global`| A string to namespace the storage key. Use this if you need multiple, separate trackers in the same app.                               |
+| `onBeforeRemove` | `(items: Recent[]) => boolean` | `() => true` | A callback function that fires before items are removed. Return `false` from this function to cancel the removal. `items` is an array of the items to be removed. |
+
+### Examples
+
+#### Limiting the Number of Recents
+
+Use the `maxRecents` prop to control how many items are kept in the history.
 
 ```tsx
-const onBeforeRemove = (items: Recent[]) => {
-  // Do something before removing items
-  return true; // return false to cancel removal
-};
+<Recents maxRecents={5} />
 ```
 
-#### Available Methods
+#### Adding a Confirmation Before Removal
 
-- **`trackVisit(location: ILocation): Promise<void>`**: Tracks a new location (URL and title).
-- **`getRecentsAsync(): Promise<ILocation[]>`**: Fetches the list of recent locations.
-- **`removeRecent(url: string): Promise<void>`**: Removes a specific recent location by its URL.
-- **`clearRecents(): Promise<void>`**: Clears all stored recents.
+Use the `onBeforeRemove` prop to ask the user for confirmation before clearing items.
 
-#### Styling
+```tsx
+const handleBeforeRemove = (itemsToRemove) => {
+  if (itemsToRemove.length > 1) {
+    // For "Clear All"
+    return window.confirm(`Are you sure you want to clear all ${itemsToRemove.length} items?`);
+  } else {
+    // For a single item
+    return window.confirm(`Are you sure you want to remove "${itemsToRemove[0].windowTitle}"?`);
+  }
+};
 
-You can customize how the `Recents` component looks by changing the CSS. The component uses the following classes:
+<Recents onBeforeRemove={handleBeforeRemove} />
+```
 
-- `.recentsContainer`
-- `.recentsTitle`
-- `.removeAllButton`
-- `.recentItem`
-- `.recentLink`
-- `.timeLabel`
-- `.removeButton`
-- `.noRecents`
-- `.noRecentsText`
+---
 
-You can change these styles by editing the `Recents.module.css` file or by writing your own styles.
+## `OnBrowserLocationTracker` Guide
 
-#### Example Styles (for reference):
+For more advanced or manual control, you can use the `OnBrowserLocationTracker` class directly.
+
+### Configuration
+
+When creating a tracker instance, you pass a configuration object with the following options:
+
+| Property                 | Type                                           | Required | Description                                                                                             |
+| ------------------------ | ---------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `maxRecents`             | `number`                                       | **Yes**  | The maximum number of recent items to store.                                                            |
+| `namespace`              | `string`                                       | No       | A string to namespace the `localStorage` key.                                                           |
+| `dontTrack`              | `object`                                       | No       | An object with rules to prevent certain URLs or titles from being tracked.                              |
+| `disregardQueryStrings`  | `array`                                        | No       | An array of rules to ignore specific query strings from URLs before tracking.                           |
+
+### Examples
+
+#### Basic Initialization
+
+```ts
+import { OnBrowserLocationTracker } from 'jattac.react.recents';
+
+const tracker = new OnBrowserLocationTracker({ maxRecents: 15 });
+```
+
+#### Excluding URLs with `dontTrack`
+
+Prevent tracking for pages like login, settings, or any page containing 'secret'.
+
+```ts
+const tracker = new OnBrowserLocationTracker({
+  maxRecents: 10,
+  dontTrack: {
+    // Matches from the start of the string
+    withPrefix: [{ url: 'https://example.com/login' }, { windowTitle: 'Settings' }],
+    // Matches from the end of the string
+    withSuffix: [{ url: '/logout' }],
+    // Matches if the substring exists anywhere
+    contains: [{ urlOrTitle: 'secret' }]
+  }
+});
+```
+
+#### Ignoring Query Strings with `disregardQueryStrings`
+
+This is useful for ignoring session IDs, tracking parameters, or filters, ensuring that ` /products?sort=price` and ` /products?sort=name` are treated as the same URL.
+
+```ts
+const tracker = new OnBrowserLocationTracker({
+  maxRecents: 10,
+  disregardQueryStrings: [
+    // For the /products path, ignore 'sort' and 'filter' query params
+    { path: '/products', queryStrings: ['sort', 'filter'] },
+    // For all paths, ignore 'utm_source' and 'session_id'
+    { path: '/', queryStrings: ['utm_source', 'session_id'] }
+  ]
+});
+```
+
+### Manual Tracking
+
+To track a visit, you need to provide an `ILocation` object.
+
+```ts
+interface ILocation {
+  url: string;
+  windowTitle: string;
+  lastVisited: string; // ISO 8601 timestamp
+}
+
+tracker.trackVisit({
+  url: window.location.href,
+  windowTitle: document.title,
+  lastVisited: new Date().toISOString(),
+});
+```
+
+---
+
+## Automatic Tracking with `withLocationTracking` HOC
+
+To automatically track all navigation within your app, you can use the `withLocationTracking` Higher-Order Component (HOC).
+
+Wrap your root component (or any component that is always mounted) with the HOC and provide it with your tracker configuration.
+
+```tsx
+// In your App.js or a layout component
+import React from 'react';
+import { withLocationTracking } from 'jattac.react.recents';
+
+const App = () => {
+  // Your app's content
+  return <div>...</div>;
+};
+
+// Configuration for the tracker
+const trackerConfig = {
+  maxRecents: 20,
+  dontTrack: { contains: [{ urlOrTitle: 'Admin' }] }
+};
+
+// Wrap your component with the HOC
+export default withLocationTracking(App, trackerConfig);
+```
+
+## Styling and Customization
+
+The component uses CSS Modules to avoid style conflicts. While the default styling is designed to be clean and modern, you can easily override it.
+
+### Overriding Styles
+
+To override the styles, target the generated class names in your own CSS file. You can inspect the component in your browser's developer tools to find the exact class names.
+
+For example, to change the color of the "Clear All" button:
 
 ```css
-.recentsContainer {
-  padding: 16px;
-  font-family: Arial, sans-serif;
-}
-
-.recentsTitle {
-  font-size: 1.5em;
-  margin-bottom: 10px;
-}
-
-.removeAllButton {
-  background-color: red;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.recentItem {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-}
-
-.recentLink {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.removeButton {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  color: red;
-}
-
-.noRecents {
-  text-align: center;
-}
-
-.noRecentsText {
-  font-size: 1.2em;
-  color: gray;
+/* In your global CSS file */
+.Recents_removeAllButton__XYZ123 {
+  background-color: #007bff !important; /* Use a more specific selector if possible */
+  color: white !important;
 }
 ```
+
+### Key CSS Classes
+
+Here are the main classes used in the component:
+
+- `.recentsContainer`: The main container.
+- `.recentsTitle`: The "Recently Visited" title.
+- `.removeAllButton`: The "Clear All" button.
+- `.recentsList`: The `<ul>` element for the list.
+- `.recentItem`: Each `<li>` list item.
+- `.favicon`: The website favicon image.
+- `.recentLink`: The `<a>` tag for the link.
+- `.timeLabel`: The timestamp text.
+- `.removeButton`: The trash icon button for removing a single item.
 
 ## Contributing
 
-If you have any suggestions, bug fixes, or improvements, feel free to open an issue or submit a pull request.
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/nyingimaina/react-recents/issues).
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
